@@ -49,7 +49,35 @@ function objCheck(obj1, obj2){
     return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
+//How To Compare Object Values
+Object.compare = function (obj1, obj2) {
+	//Loop through properties in object 1
+	for (var p in obj1) {
+		//Check property exists on both objects
+		if (obj1.hasOwnProperty(p) !== obj2.hasOwnProperty(p)) return false;
+ 
+		switch (typeof (obj1[p])) {
+			//Deep compare objects
+			case 'object':
+				if (!Object.compare(obj1[p], obj2[p])) return false;
+				break;
+			//Compare function code
+			case 'function':
+				if (typeof (obj2[p]) == 'undefined' || (p != 'compare' && obj1[p].toString() != obj2[p].toString())) return false;
+				break;
+			//Compare values
+			default:
+				if (obj1[p] != obj2[p]) return false;
+		}
+	}
+ 
+	//Check object 2 for any extra properties
+	for (var p in obj2) {
+		if (typeof (obj1[p]) == 'undefined') return false;
+	}
+	return true;
+}
+
 function deepEqual(value1, value2){
 
     // Array to Array
@@ -76,25 +104,7 @@ function deepEqual(value1, value2){
         return true; 
         // Object to Object
     } else if ( !(Array.isArray(value1, value2)) && typeof value1 === 'object' && typeof value2 === 'object'){
-        if (value1 === value2) return true; // if their reference is the same which is unlikely!
-        if ((Object.keys(value1)).length !== (Object.keys(value2)).length) return false; // if the length of their keys is not the same, not equal!
-        if (!(arrCheck((Object.keys(value1)).sort(), (Object.keys(value2)).sort()))) return false; // if they have different key names.
-    
-        for (let i = 0 ; i < ((Object.keys(value1)).sort()).length ; i++){
-            const ref = ((Object.keys(value1)).sort());
-            if (value1[ref[i]] !== value2[ref[i]]){
-                if (Array.isArray(value1[ref[i]]) && Array.isArray(value2[ref[i]])){
-                    if (typeof value1[ref[i]] === 'object' && typeof value2[ref[i]] === 'object'){
-                        return objCheck(value1[ref[i]], value2[ref[i]]);
-                    }
-                    if (!(arrCheck(value1[ref[i]], value2[ref[i]]))) return false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return Object.compare(value1, value2);
         // other types
     } else if (typeof value1 === 'number' && typeof value2 === 'number'){
         if (value === value2) return true;
@@ -110,9 +120,6 @@ function deepEqual(value1, value2){
     }
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
 // console.log([1, [2], [3, 4], {a: 1, b: 2}].toString().split(','));
 // console.log(recursionFlat([1, [2], [3, 4], 'a', ['b', 'c'], {a: 1, b: 2}]));
 
@@ -121,6 +128,5 @@ console.log(deepEqual(1, [1]));
 console.log(deepEqual([1, [2, 3]], [1, [2, 3]]));
 console.log(deepEqual([1, 2], [2, 1]));
 console.log(deepEqual({a: 1, b: 2}, {b: 2, a: 1}))
-
 console.log(deepEqual({a: [1, 2, 3], b: {c: '4'}}, {a: [1, 2, 3], b: {c: '4'}}));
 console.log(deepEqual({a: [1, 2, 3], b: {c: 4}}, {a: [1, 2, 3], b: {c: 5}}));
