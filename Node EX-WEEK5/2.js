@@ -52,7 +52,7 @@ function objCheck(obj1, obj2){
 //How To Compare Object Values
 Object.compare = function (obj1, obj2) {
 	//Loop through properties in object 1
-	for (var p in obj1) {
+	for (let p in obj1) {
 		//Check property exists on both objects
 		if (obj1.hasOwnProperty(p) !== obj2.hasOwnProperty(p)) return false;
  
